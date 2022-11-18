@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Socket.io Chat</title>
+</head>
+<body>
+    <div id="container">
+        <div id="chat-window">
+            <div id="output"></div>
+            <div id="feedback"></div>
+        </div>
+        <input type="text" id="handle" placeholder="Handle">
+        <input type="text" id="message" placeholder="Message">
+        <button id="send">Send</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+    <script>
+        // Make connection
+        var socket = io.connect('http://localhost:3000');
+
+        // Query DOM
+        var message = document.getElementById('message'),
+            handle = document.getElementById('handle'),
+            btn = document.getElementById('send'),
+            output = document.getElementById('output'),
+            feedback = document.getElementById('feedback');
+
+        // Emit events
+        btn.addEventListener('click', function() {
+            socket.emit('chat', {
+                message: message.value,
+                handle: handle.value
+            });
+        });
+
+        message.addEventListener('keypress', function() {
+            socket.emit('typing', handle.value);
+        });
+
+        // Listen for events
+        socket.on('chat', function(data) {
+            feedback.innerHTML = '';
+            output.innerHTML += '<p><strong>' + data.handle + ': </strong>' + data.message + '</p>';
+        });
+
+        socket.on('typing', function(data) {
+            feedback.innerHTML = '<p><em>' + data + ' is typing a message...</em></p>';
+        });
+
+    </script>
+
+    <style>
+        #container {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            background: #f1f1f1;
+        }
+
+        #chat-window {
+            width: 100%;
+            height: 400px;
+            background: #fff;
+            margin: 0 auto;
+            overflow: auto;
+        }
+
+        #output {
+            padding: 10px;
+        }
+
+        #feedback {
+            padding: 10px;
+        }
+
+        #handle {
+            width: 100%;
+            height: 40px;
+            margin: 0 auto;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #message {
+            width: 100%;
+            height: 40px;
+            margin: 0 auto;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #send {
+            width: 100%;
+            height: 40px;
+            margin: 0 auto;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        
+    </style>
+</body>
+</html>
